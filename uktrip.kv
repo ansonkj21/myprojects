@@ -1,0 +1,96 @@
+#:kivy 2.3.0
+#:import MapView kivy_garden.mapview.MapView
+
+BoxLayout:
+    orientation: "vertical"
+
+    # --- Search bar ---
+    BoxLayout:
+        size_hint_y: None
+        height: dp(48)
+        padding: dp(6)
+        spacing: dp(6)
+        TextInput:
+            id: search_input
+            hint_text: "Search a place, address, or postcode"
+            multiline: False
+            on_text_validate: app.do_search(self.text)
+        Button:
+            text: "Search"
+            size_hint_x: None
+            width: dp(90)
+            on_release: app.do_search(search_input.text)
+
+    # --- Category buttons ---
+    BoxLayout:
+        size_hint_y: None
+        height: dp(40)
+        padding: dp(6), 0
+        spacing: dp(6)
+        Button:
+            text: "Attractions"
+            on_release: app.search_category("Attractions")
+        Button:
+            text: "Petrol Pumps"
+            on_release: app.search_category("Petrol Pumps")
+        Button:
+            text: "Restaurants"
+            on_release: app.search_category("Restaurants")
+
+    # --- Search results (shown only when there are results); grouped
+    # under distance-band headers for category searches (e.g. "0.1 - 1 mile") ---
+    ScrollView:
+        id: results_scroll
+        size_hint_y: None
+        height: min(results_list.minimum_height, dp(220))
+        BoxLayout:
+            id: results_list
+            orientation: "vertical"
+            size_hint_y: None
+            height: self.minimum_height
+
+    # --- Day selector ---
+    BoxLayout:
+        size_hint_y: None
+        height: dp(48)
+        padding: dp(6)
+        spacing: dp(6)
+        Spinner:
+            id: day_spinner
+            text: app.current_day
+            values: app.day_names
+            on_text: app.select_day(self.text)
+        Button:
+            text: "+ Day"
+            size_hint_x: None
+            width: dp(70)
+            on_release: app.add_day()
+        Label:
+            text: app.status_message
+            color: 0.85, 0.2, 0.2, 1
+            size_hint_x: None
+            width: dp(140)
+            font_size: "12sp"
+
+    # --- Map ---
+    MapView:
+        id: mapview
+        lat: app.map_lat
+        lon: app.map_lng
+        zoom: app.map_zoom
+
+    # --- Pins for the currently selected day ---
+    Label:
+        text: "Pins for {}".format(app.current_day)
+        size_hint_y: None
+        height: dp(28)
+        bold: True
+
+    ScrollView:
+        size_hint_y: None
+        height: dp(160)
+        BoxLayout:
+            id: pins_list
+            orientation: "vertical"
+            size_hint_y: None
+            height: self.minimum_height
